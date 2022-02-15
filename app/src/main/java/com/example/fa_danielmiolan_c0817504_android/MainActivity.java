@@ -1,9 +1,11 @@
 package com.example.fa_danielmiolan_c0817504_android;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,21 @@ public class MainActivity extends AppCompatActivity {
         locationRV.setHasFixedSize(true);
 
         locationRV.setAdapter(placeAdapter);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                placeVM.delete(placesList.get(viewHolder.getAdapterPosition()));
+                Toast.makeText(getApplicationContext(), "Place deleted.", Toast.LENGTH_LONG).show();
+            }
+        };
+
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(locationRV);
 
         openMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
