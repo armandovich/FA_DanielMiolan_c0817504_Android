@@ -183,24 +183,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
-    public void onMarkerDragStart(Marker marker) { }
-
-    @Override
-    public void onMarkerDrag(Marker marker) { }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        LatLng pos = marker.getPosition();
-        String address = marker.getTitle();
-
-        if(currentMarker != null) {
-            currentMarker.remove();
-        }
-
-        drawPlaceMarker(pos, address);
-    }
-
     private boolean hasLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -256,5 +238,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
             return "Undefined";
         }
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) { }
+
+    @Override
+    public void onMarkerDrag(Marker marker) { }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        LatLng pos = marker.getPosition();
+        String address = marker.getTitle();
+
+        if(currentMarker != null) {
+            currentMarker.remove();
+        }
+
+        drawPlaceMarker(pos, address);
     }
 }
