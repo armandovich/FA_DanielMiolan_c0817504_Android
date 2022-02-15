@@ -165,22 +165,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                String addressStr = getAddressFromLocation(latLng);
+                generateMarkerFromClick(latLng);
+            }
+        });
 
-                binding.placeAddressInput.setText(addressStr);
-                binding.placeLatInput.setText("" + latLng.latitude);
-                binding.placeLongInput.setText("" + latLng.longitude);
-
-                mMap.clear();
-                drawUserMarker();
-                drawPlaceMarker(latLng, addressStr);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                generateMarkerFromClick(latLng);
             }
         });
 
         if (hasLocationPermission()) {
             updateUserLocation();
         }
+    }
+
+    private void generateMarkerFromClick(LatLng latLng) {
+        String addressStr = getAddressFromLocation(latLng);
+
+        binding.placeAddressInput.setText(addressStr);
+        binding.placeLatInput.setText("" + latLng.latitude);
+        binding.placeLongInput.setText("" + latLng.longitude);
+
+        mMap.clear();
+        drawUserMarker();
+        drawPlaceMarker(latLng, addressStr);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
     }
 
     private boolean hasLocationPermission() {
