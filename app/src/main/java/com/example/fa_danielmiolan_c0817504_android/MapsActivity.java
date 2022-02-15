@@ -43,6 +43,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private boolean didZoomToUser = false;
+    private boolean editModeActive = false;
+    private Place selectedPlace = new Place();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 savePlace(view);
             }
         });
+
+        Place tempPlace = (Place) getIntent().getSerializableExtra("Place");
+
+        if (tempPlace != null) {
+            editModeActive = true;
+            selectedPlace = tempPlace;
+            binding.placeAddressInput.setText(tempPlace.getAddress());
+            binding.placeLatInput.setText("" + tempPlace.getLatitude());
+            binding.placeLongInput.setText("" + tempPlace.getLongitude());
+            binding.placeVisitSwitch.setChecked(tempPlace.getStatus());
+        } else {
+            binding.deletePlaceBtn.setEnabled(false);
+            binding.deletePlaceBtn.setAlpha(0);
+        }
     }
 
     private void savePlace(View view) {
@@ -93,10 +109,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         place.setLatitude(lat);
         place.setLongitude(lon);
 
-        MainActivity.placeVM.insert(place);
-        Toast.makeText(view.getContext(), "Place saved.", Toast.LENGTH_LONG).show();
-
-        clearInputs();
+        if (editModeActive) {
+            place.setId(selectedPlace.getId());
+            MainActivity.placeVM.update(place);
+            Toast.makeText(view.getContext(), "Place updated.", Toast.LENGTH_LONG).show();
+        } else {
+            MainActivity.placeVM.insert(place);
+            Toast.makeText(view.getContext(), "Place saved.", Toast.LENGTH_LONG).show();
+            clearInputs();
+        }
     }
 
     private void clearInputs() {

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -58,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
         placeVM.getAllPlaces().observe(this, new Observer<List<Place>>() {
             @Override
             public void onChanged(List<Place> places) {
+                placesList.clear();
                 placesList = places;
-                placeAdapter.submitList(places);
+                placeAdapter.submitList(placesList);
+                placeAdapter.notifyDataSetChanged();
             }
         });
     }

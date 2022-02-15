@@ -1,5 +1,7 @@
 package com.example.fa_danielmiolan_c0817504_android;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +40,7 @@ public class PlaceRVAdapter extends ListAdapter<Place, PlaceRVAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PlaceRVAdapter.ViewHolder holder, int position) {
-        Place model = getProductAt(position);
+        Place model = getPlaceAt(position);
         holder.tempID = model.getId();
         holder.addressTV.setText(model.getAddress());
 
@@ -52,7 +54,7 @@ public class PlaceRVAdapter extends ListAdapter<Place, PlaceRVAdapter.ViewHolder
         holder.longitudeTV.setText("" + model.getLongitude());
     }
 
-    public Place getProductAt(int position) {
+    public Place getPlaceAt(int position) {
         return getItem(position);
     }
 
@@ -74,10 +76,14 @@ public class PlaceRVAdapter extends ListAdapter<Place, PlaceRVAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
+                    Context context = v.getContext();
+
+                    Intent intent = new Intent(context, MapsActivity.class);
+                    intent.putExtra("Place", getPlaceAt(position));
+                    context.startActivity(intent);
+
                     if (listener != null && position != RecyclerView.NO_POSITION) {
                         listener.onItemClick(getItem(position));
-                        // TO-DO
-                        // OPEN PLACE TO EDIT
                     }
                 }
             });
