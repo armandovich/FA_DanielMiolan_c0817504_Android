@@ -1,11 +1,13 @@
 package com.example.fa_danielmiolan_c0817504_android;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -14,6 +16,11 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.fa_danielmiolan_c0817504_android.databinding.ActivityMapsBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -28,6 +35,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -90,6 +99,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 deletePlace(view);
+            }
+        });
+
+
+        binding.searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.clear();
+                Intent i = getIntent();
+                String type = binding.searchPlaceInput.getText().toString();
+                RequestQueue queue = Volley.newRequestQueue(view.getContext());
+
+
+                StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+                googlePlacesUrl.append("location=").append(userLocation.latitude).append(",").append(userLocation.longitude);
+                googlePlacesUrl.append("&radius=").append(100);
+                googlePlacesUrl.append("&types=").append(type);
+                googlePlacesUrl.append("&sensor=true");
+                googlePlacesUrl.append("&key=" + getResources().getString(R.string.map_key));
+
+                Log.i("DEBUG", "" + googlePlacesUrl.toString());
+
+                JsonObjectRequest request = new JsonObjectRequest(googlePlacesUrl.toString(),
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject result) {
+                                Log.i("DEBUG", "onResponse: Result= " + result.toString());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e("DEBUG", "onErrorResponse: Error= " + error);
+                                Log.e("DEBUG", "onErrorResponse: Error= " + error.getMessage());
+                                // GETTING NEXT ERROR
+                                // "You must enable Billing on the Google Cloud Project at"
+                            }
+                        }
+                );
+
+                queue.add(request);
             }
         });
 
