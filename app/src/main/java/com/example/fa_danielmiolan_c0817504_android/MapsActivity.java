@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -22,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private Button saveBtn, deleteBtn, backBtn;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private FusedLocationProviderClient locationProviderClient;
@@ -42,6 +46,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        binding.backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MapsActivity.super.onBackPressed();
+            }
+        });
     }
 
     /**
