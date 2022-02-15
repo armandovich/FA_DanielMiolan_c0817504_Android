@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="#2196F3"
         android:text="Save"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -33,6 +34,7 @@
         android:layout_marginRight="15dp"
         android:backgroundTint="#E91E63"
         android:text="Delete"
+        android:textColor="#FFFFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/savePlaceBtn" />
 

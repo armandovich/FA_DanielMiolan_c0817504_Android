@@ -20,7 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-black"
-            android:text="Status" />
+            android:text="Status"
+            android:textAlignment="viewEnd"
+            android:textColor="#4CAF50" />
 
         <TextView
             android:id="@+id/placeAddress"

@@ -37,9 +37,7 @@ public class Place {
         this.address = description;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
+    public boolean getStatus() { return status; }
 
     public void setStatus(boolean status) {
         this.status = status;

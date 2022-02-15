@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Intent;
@@ -17,6 +18,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private Button openMapBtn;
+    private RecyclerView locationRV;
+    private PlaceRVAdapter placeAdapter = new PlaceRVAdapter();
     private static final int REQUEST_CODE = 1;
 
     public static PlaceViewModel placeVM;
@@ -30,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         placeVM = new ViewModelProvider(this).get(PlaceViewModel.class);
 
         openMapBtn =  findViewById(R.id.openMapBtn);
+        locationRV = findViewById(R.id.locationRV);
+
+        locationRV.setAdapter(placeAdapter);
 
         openMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Place> places) {
                 placesList = places;
+                placeAdapter.submitList(places);
             }
         });
     }
