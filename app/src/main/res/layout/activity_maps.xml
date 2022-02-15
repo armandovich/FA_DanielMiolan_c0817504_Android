@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
-        android:backgroundTint="#3F51B5"
+        android:backgroundTint="#FF5722"
         android:text="Back"
         android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,14 +67,17 @@
             android:fontFamily="sans-serif-black"
             android:text="Address:" />
 
-        <EditText
+        <TextView
             android:id="@+id/placeAddressInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Address"
-            android:inputType="textPersonName"
-            android:minHeight="48dp" />
+            android:background="#ECE8E8"
+            android:clickable="false"
+            android:gravity="center|left"
+            android:minHeight="48dp"
+            android:text="Undefined"
+            android:textColorHint="#000000"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -95,15 +98,20 @@
                     android:fontFamily="sans-serif-black"
                     android:text="Latitude:" />
 
-                <EditText
+                <TextView
                     android:id="@+id/placeLatInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:ems="10"
+                    android:background="#FFECE8E8"
+                    android:gravity="center|left"
                     android:hint="Latitude"
                     android:inputType="numberDecimal"
-                    android:minHeight="48dp" />
+                    android:minHeight="48dp"
+                    android:text="0.0"
+                    android:layout_marginRight="5dp"
+                    android:textColorHint="#000000"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -120,15 +128,19 @@
                     android:fontFamily="sans-serif-black"
                     android:text="Longitude:" />
 
-                <EditText
+                <TextView
                     android:id="@+id/placeLongInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Longitude"
+                    android:background="#FFECE8E8"
+                    android:gravity="center|left"
                     android:inputType="numberDecimal"
-                    android:minHeight="48dp" />
+                    android:layout_marginRight="5dp"
+                    android:minHeight="48dp"
+                    android:text="0.0"
+                    android:textColorHint="#000000"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout

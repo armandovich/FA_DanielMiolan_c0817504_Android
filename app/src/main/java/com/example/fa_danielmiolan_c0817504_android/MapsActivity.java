@@ -2,6 +2,8 @@ package com.example.fa_danielmiolan_c0817504_android;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
@@ -20,11 +22,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private Geocoder geocoder;
+    private List<Address> addresses;
+    private LatLng userLocation = new LatLng(0,0);
     private Button saveBtn, deleteBtn, backBtn;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -46,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        geocoder = new Geocoder(this, Locale.getDefault());
 
         binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,8 +84,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng latLng) {
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
-                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
+
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    String addressStr = "" + addresses.get(0).getAddressLine(0);
+                    markerOptions.title(addressStr);
+                    binding.placeAddressInput.setText(addressStr);
+
+                } catch (IOException e) {
+                    markerOptions.title(latLng.latitude + " : " + latLng.longitude);
+                    e.printStackTrace();
+                }
+
+                binding.placeLatInput.setText("" + latLng.latitude);
+                binding.placeLongInput.setText("" + latLng.longitude);
+
                 mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
                 mMap.addMarker(markerOptions);
             }
@@ -102,15 +128,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                mMap.clear();
-
                 if (locationResult != null) {
                     Location location = locationResult.getLastLocation();
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!"));
+                    userLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                     if (!didZoomToUser) {
                         didZoomToUser = true;
+                        mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
                     }
                 }
