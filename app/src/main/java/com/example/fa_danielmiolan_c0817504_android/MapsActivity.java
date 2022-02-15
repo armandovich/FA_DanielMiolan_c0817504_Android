@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -64,6 +65,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MapsActivity.super.onBackPressed();
             }
         });
+
+        binding.savePlaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                savePlace(view);
+            }
+        });
+    }
+
+    private void savePlace(View view) {
+        String address = binding.placeAddressInput.getText().toString();
+        String latStr = binding.placeLatInput.getText().toString();
+        String lonStr = binding.placeLongInput.getText().toString();
+        boolean status = binding.placeVisitSwitch.isChecked();
+        double lat = latStr.equals("") ? 0 : Double.parseDouble(latStr);
+        double lon = lonStr.equals("") ? 0 : Double.parseDouble(lonStr);
+
+        if(address.equals("Undefined")) {
+            Toast.makeText(view.getContext(), "Place address can't be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Place place = new Place();
+        place.setAddress(address);
+        place.setStatus(status);
+        place.setLatitude(lat);
+        place.setLongitude(lon);
+
+        MainActivity.placeVM.insert(place);
+        Toast.makeText(view.getContext(), "Place saved.", Toast.LENGTH_LONG).show();
+
+        clearInputs();
+    }
+
+    private void clearInputs() {
+        binding.placeAddressInput.setText("Undefined");
+        binding.placeLatInput.setText("0.0");
+        binding.placeLongInput.setText("0.0");
+        binding.placeVisitSwitch.setChecked(false);
+
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
     }
 
     /**

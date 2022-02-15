@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
         openMapBtn =  findViewById(R.id.openMapBtn);
         locationRV = findViewById(R.id.locationRV);
+        locationRV.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        locationRV.setHasFixedSize(true);
 
         locationRV.setAdapter(placeAdapter);
 
