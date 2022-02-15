@@ -75,6 +75,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        binding.deletePlaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletePlace(view);
+            }
+        });
+
         Place tempPlace = (Place) getIntent().getSerializableExtra("Place");
 
         if (tempPlace != null) {
@@ -118,6 +125,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(view.getContext(), "Place saved.", Toast.LENGTH_LONG).show();
             clearInputs();
         }
+    }
+
+    private void deletePlace(View view) {
+        editModeActive = false;
+        MainActivity.placeVM.delete(selectedPlace);
+        Toast.makeText(view.getContext(), "Place deleted.", Toast.LENGTH_LONG).show();
+        clearInputs();
     }
 
     private void clearInputs() {
