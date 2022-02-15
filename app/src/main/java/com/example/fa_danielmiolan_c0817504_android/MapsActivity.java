@@ -26,18 +26,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
     private Geocoder geocoder;
-    private List<Address> addresses;
     private LatLng userLocation = new LatLng(0,0);
-    private Button saveBtn, deleteBtn, backBtn;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private FusedLocationProviderClient locationProviderClient;
@@ -46,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean didZoomToUser = false;
     private boolean editModeActive = false;
     private Place selectedPlace = new Place();
+    private Marker currentMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,57 +152,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding.placeVisitSwitch.setChecked(false);
 
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        drawUserMarker();
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMarkerDragListener(this);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
+                String addressStr = getAddressFromLocation(latLng);
 
-                try {
-                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    String addressStr = "" + addresses.get(0).getAddressLine(0);
-                    markerOptions.title(addressStr);
-                    binding.placeAddressInput.setText(addressStr);
-
-                } catch (IOException e) {
-                    markerOptions.title(latLng.latitude + " : " + latLng.longitude);
-                    e.printStackTrace();
-                }
-
+                binding.placeAddressInput.setText(addressStr);
                 binding.placeLatInput.setText("" + latLng.latitude);
                 binding.placeLongInput.setText("" + latLng.longitude);
 
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                drawUserMarker();
+                drawPlaceMarker(latLng, addressStr);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                mMap.addMarker(markerOptions);
             }
         });
 
         if (hasLocationPermission()) {
             updateUserLocation();
         }
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) { }
+
+    @Override
+    public void onMarkerDrag(Marker marker) { }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        LatLng pos = marker.getPosition();
+        String address = marker.getTitle();
+
+        if(currentMarker != null) {
+            currentMarker.remove();
+        }
+
+        drawPlaceMarker(pos, address);
     }
 
     private boolean hasLocationPermission() {
@@ -223,9 +218,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Location location = locationResult.getLastLocation();
                     userLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
+                    if (selectedPlace.getId() > 0) {
+                        LatLng latLng = new LatLng(selectedPlace.getLatitude(), selectedPlace.getLongitude());
+                        drawPlaceMarker(latLng, selectedPlace.getAddress());
+                    }
+
                     if (!didZoomToUser) {
                         didZoomToUser = true;
-                        mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        drawUserMarker();
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
                     }
                 }
@@ -236,5 +236,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    private void drawPlaceMarker(LatLng latLng, String address) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng).title(address).draggable(true);
+
+        currentMarker = mMap.addMarker(markerOptions);
+    }
+
+    private void drawUserMarker() {
+        mMap.addMarker(new MarkerOptions().position(userLocation).title("your location!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+    }
+
+    private String getAddressFromLocation(LatLng latLng) {
+        try {
+            return  "" + geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Undefined";
+        }
     }
 }
