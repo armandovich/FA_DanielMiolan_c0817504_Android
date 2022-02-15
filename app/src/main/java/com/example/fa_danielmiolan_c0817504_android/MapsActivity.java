@@ -211,12 +211,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Location location = locationResult.getLastLocation();
                     userLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    if (selectedPlace.getId() > 0) {
-                        LatLng latLng = new LatLng(selectedPlace.getLatitude(), selectedPlace.getLongitude());
-                        drawPlaceMarker(latLng, selectedPlace.getAddress());
-                    }
-
                     if (!didZoomToUser) {
+                        if (selectedPlace.getId() > 0) {
+                            LatLng latLng = new LatLng(selectedPlace.getLatitude(), selectedPlace.getLongitude());
+                            drawPlaceMarker(latLng, selectedPlace.getAddress());
+                        }
+
                         didZoomToUser = true;
                         drawUserMarker();
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
