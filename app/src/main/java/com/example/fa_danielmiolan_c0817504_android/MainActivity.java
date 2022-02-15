@@ -1,37 +1,39 @@
 package com.example.fa_danielmiolan_c0817504_android;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button openMapBtn;
     private static final int REQUEST_CODE = 1;
 
+    public static PlaceViewModel placeVM;
+    public static List<Place> placesList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        placeVM = new ViewModelProvider(this).get(PlaceViewModel.class);
 
         openMapBtn =  findViewById(R.id.openMapBtn);
 
         openMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TO-DO
                 Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
                 startActivity(myIntent);
             }
@@ -39,5 +41,16 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, REQUEST_CODE);
+
+        loadPlaces();
+    }
+
+    private void loadPlaces() {
+        placeVM.getAllPlaces().observe(this, new Observer<List<Place>>() {
+            @Override
+            public void onChanged(List<Place> places) {
+                placesList = places;
+            }
+        });
     }
 }
